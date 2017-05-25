@@ -1,7 +1,7 @@
 ################################################################
 #                                                              #
 # count people #                                               #
-# created and developped by Bufo Innovation #                  #
+# created and developped by Infinities #                       #
 # Developer : Ria Santra      #                                #
 # Company Website : http://www.bufo.co.in #                    #
 #                                                              #

@@ -1,8 +1,8 @@
 ################################################################
 #                                                              #
 # count people #                                               #
-# created and developped by Bufo Innovation #                  #
-# Developer : Pritam Samadder #                                #
+# created and developped by Infinities #                       #
+# Developer : Pritam Samadder & Ria Santra #                   #
 # Company Website : http://www.bufo.co.in #                    #
 #                                                              #
 #                                                              #
@@ -29,22 +29,30 @@ import datetime
 import time
 import sys
 from pymongo import MongoClient
+import tkinter as tk
+from tkinter import filedialog
+
 
 
 
 class TrackingPeople:
 
 
-    def __init__(self):
+    def __init__(self,ismongodb=False):
 
-        self.conn=cu.connectDB()
-        print("conn = : ",self.conn)
-        #input()
-        self.db=cu.selectDB(self.conn,"bufo")
-        print("db = : ",self.db)
+        self.ismongodb=ismongodb
+
+        if ismongodb:
+
+            self.conn=cu.connectDB()
+            print("conn = : ",self.conn)
+            #input()
+            self.db=cu.selectDB(self.conn,"bufo")
+            print("db = : ",self.db)
         self.personcount=1
 
-
+    #videostream = parameters[0] , width = parameters[1] , islivestream = parameters[2] , isnovideo = parameters[3] , starttime= parameters[4]
+    #frameskip=parameters[5],flushtime=parameters[6],output=parameters[7],debug=parameters[8]
     def TrackPeoples(self,parameters):
         
         
@@ -85,9 +93,12 @@ class TrackingPeople:
         livestream=islivestream
 
         if livestream:
-            video=int(video)
-            if video < 0:
-                video=0
+            try :
+                video = int(video)
+                if video < 0:
+                    video = 0
+            except:
+                pass
         
         cleartime=int(flushtime)
         
@@ -256,7 +267,8 @@ class TrackingPeople:
                         storethread.start()
                         storethread.join()
                         if len(finaldatabase)>0:
-                            self.updateData(self.db,"track",finaldatabase)
+                            if(self.ismongodb):
+                                self.updateData(self.db,"track",finaldatabase)
                             fulldatabase.extend(finaldatabase)
                             finaldatabase.clear()
                         print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -308,7 +320,7 @@ class TrackingPeople:
             if cu.isNearCentroid(cen,p[0]):
                 
                 database[i][0]=person
-                database[i][1].append(str([list(cen),datetime.datetime.now().ctime()]))
+                database[i][1].append([list(cen),datetime.datetime.now().ctime()])
                 database[i][2]=[datetime.datetime.now()]
                 newperson=False
                 return 1
@@ -317,8 +329,9 @@ class TrackingPeople:
 
             pdata=[[],[],[]]
             pdata[0]=person
+            pdata[0]=person
             pdata[1]=[]
-            pdata[1].append(str([list(cen),datetime.datetime.now().ctime()]))
+            pdata[1].append([list(cen),datetime.datetime.now().ctime()])
             pdata[2]=[datetime.datetime.now()]
             
             
@@ -381,17 +394,32 @@ class TrackingPeople:
             lockstatus[0]=False
 
 
+if __name__=="__main__":
 
-##r,data,shape,vid=TrackPeople("F:\\BUFO WORK\\INPROGRESS\\detect_and_count BETA 1.0\\bin\\scripts\\v.mp4",250,islivestream=False,isnovideo=False,starttime=None,frameskip=0,flushtime=1000,output=None,debug=False)
-##f=open("F:\\BUFO WORK\\INPROGRESS\\detect_and_count BETA 1.0\\bin\\scripts\\test7.json","w",encoding="utf-8")
-##
-##print(data)
-##data=repr(data)
-##print(type(data))
-###print(len(data))
-##data=eval(data)
-##
-##json.dump([shape,vid,data],f)
-###json.dump(data,f)
-##f.flush()
-##f.close()
+    print("press 1 to track from video file")
+    print("press 2 to track from webcam")
+    ans=int(input())
+    if ans!=1:
+        vidpath=int(input("enter the webcam number you want to process : "))
+        param=[vidpath,250,True,False,None,0,1000,None,False]
+    else:
+        vidpath=filedialog.askopenfilename()
+        param = [vidpath, 250, False, False, None, 0, 1000, None, True]
+    tp=TrackingPeople()
+    print("enter path to the output file : ")
+    outfilepath=filedialog.askopenfilename()
+
+    r,data,shape,vid=tp.TrackPeoples(param)
+    f = open(outfilepath, "w", encoding="utf-8")
+
+
+    print(data)
+    data=repr(data)
+    print(type(data))
+    #print(len(data))
+    data=eval(data)
+
+    json.dump([shape,vid,data],f)
+    #json.dump(data,f)
+    f.flush()
+    f.close()
