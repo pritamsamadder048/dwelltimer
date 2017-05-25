@@ -53,7 +53,7 @@ def visualiseTracks(vfile):
 
         people=len(data)
         print("number of people : ",people)
-        print(data)
+        #print(data)
 
         cap=cv2.VideoCapture(stream)
         if not cap.isOpened():
@@ -90,9 +90,9 @@ def visualiseTracks(vfile):
             while(k<(len(person[str(l)])-1)):
 
                 p0=(int(person[str(l)][k][0][0]*xratio),int(person[str(l)][k][0][1]*yratio))
-                print(p0)
+                #print(p0)
                 p1=(int(person[str(l)][k+1][0][0]*xratio),int(person[str(l)][k+1][0][1]*yratio))
-                print(p1)
+                #print(p1)
                 cv2.arrowedLine(frame,p0,p1,colors[i],2)
                 k+=1
 
