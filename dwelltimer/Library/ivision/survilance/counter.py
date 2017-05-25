@@ -2,7 +2,7 @@
 #                                                              #
 # count people #                                               #
 # created and developped by Bufo Innovation #                  #
-# Developer : Pritam Samadder #                                #
+# Developer : Pritam Samadder Ria Santra #                     #
 # Company Website : http://www.bufo.co.in #                    #
 #                                                              #
 #                                                              #
@@ -39,14 +39,17 @@ class inputs:
 
 class PeopleCount:
 
-    def __init__(self):
+    def __init__(self,ismongodb=False):
 
-        self.conn=cu.connectDB()
-        print("conn = : ",self.conn)
-        #input()
-        self.db=cu.selectDB(self.conn,"bufo")
-        print("db = : ",self.db)
-        #input()
+        self.ismongodb=ismongodb
+
+        if ismongodb:
+
+            self.conn=cu.connectDB()
+            print("conn = : ",self.conn)
+            #input()
+            self.db=cu.selectDB(self.conn,"bufo")
+            print("db = : ",self.db)
 
     def CountPeople(self,parameters):
 
@@ -216,16 +219,30 @@ class PeopleCount:
 
 
             elif livestream:
-                # read the stream from IP camera
-                import urllib.request
-                ip_stream = urllib.request.urlopen(videostream)        # videostream corresponds to http URI
-                print(ip_stream.headers['Content-Length'])
-                if ip_stream.status != 200:
-                    raise(Exception("Unable to fetch video from the IP"))
-                totalframes=0
-                videolength=0
-                global bytes
-                bytes = bytes()
+
+                if("http" in videostream):
+                    # read the stream from IP camera
+                    import urllib.request
+                    ip_stream = urllib.request.urlopen(videostream)        # videostream corresponds to http URI
+                    print(ip_stream.headers['Content-Length'])
+                    if ip_stream.status != 200:
+                        raise(Exception("Unable to fetch video from the IP"))
+                    totalframes=0
+                    videolength=0
+                    global bytes
+                    bytes = bytes()
+
+                else:
+
+                    cap = cv2.VideoCapture(int(videostream))
+                    fps = cap.get(cv2.CAP_PROP_FPS)
+                    if first == True:
+                        r, prevframe = cap.read()
+                        if not r:
+                            print("video finished ")
+                            raise (Exception("Video Finished"))
+                            print("executed 1")
+                        first = False
 
 
             print("first ", first)
@@ -235,7 +252,7 @@ class PeopleCount:
                 while True:
 
                     ret = True
-                    if livestream:
+                    if livestream and "http" in videostream:
                         # read individual frame from ip_stream
                         bytes += ip_stream.read(65536)
 
