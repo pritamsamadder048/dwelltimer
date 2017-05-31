@@ -1,9 +1,9 @@
 ################################################################
 #                                                              #
 # peoplecountconfig.py #                                       #
-# created and developped by Bufo Innovation #                  #
+# created and developped by Infinity Corporation #             #
 # Developer : Ria Santra #                                     #
-# Company Website : http://www.bufo.co.in #                    #
+#                                                              #
 #                                                              #
 #                                                              #
 ################################################################
@@ -22,6 +22,7 @@ import numpy as np
 import cvutil as cu
 import argparse
 import json
+from tkinter import filedialog
 
 
 verbose = False
@@ -65,29 +66,31 @@ class inputs:
     livestream = False
     verbose = False
 
-def PeopleCounterConfig():
+def PeopleCounterConfig(video_filename,confpath,livestream=False,width=250,debug=True):
 
     global verbose
     global point1
     global point2
     global pcconfigpoints
 
+    verbose=debug
+
     configuration={}
 
     cap=None
 
-    video_filename = inputs.video_filename
-    activity_id = inputs.activity_id
-    camera_id = inputs.camera_id
-    livestream = inputs.livestream
-    debug = inputs.verbose
-    width = inputs.width
+    # video_filename = inputs.video_filename
+    # activity_id = inputs.activity_id
+    # camera_id = inputs.camera_id
+    # livestream = inputs.livestream
+    # debug = inputs.verbose
+    # width = inputs.width
 
 
     
     try:
-        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..', '..'))
-        video = (os.path.join(base_path,'runtime',camera_id, activity_id,video_filename))
+        #base_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..', '..'))
+        video = video_filename #filedialog.askopenfilename() #(os.path.join(base_path,'runtime',camera_id, activity_id,video_filename))
 
         if not width >= 250 and width <= 640:
             width = 250
@@ -99,7 +102,7 @@ def PeopleCounterConfig():
         if debug:
             verbose=True
         
-        confpath = (os.path.join(base_path,'runtime',camera_id,activity_id,"config.json"))
+        #confpath = filedialog.asksaveasfilename() #(os.path.join(base_path,'runtime',camera_id,activity_id,"config.json"))
 
         cap=cv2.VideoCapture(video)
         
@@ -235,7 +238,7 @@ def PeopleCounterConfig():
         
         print("Fatal ERROR  ")
         print(e)
-        activity_id = False
+        # activity_id = False
         video_filename = False
 
     finally:
@@ -244,54 +247,151 @@ def PeopleCounterConfig():
             if cap.isOpened():
                 cap.release()
             cv2.destroyAllWindows()
-        return (activity_id, video_filename)
+        return (video_filename)
+#
+# #call PeopleCounterConfig_CommandInput() function if you are passing the parameter as command line arguments
+# def PeopleCounterConfig_CommandInput():
+#
+#
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("videostream",help="The video input stream")
+#     parser.add_argument("-l", "--livestream", action="store_true",help="use this option if you are reading livestream from a camera")
+#     parser.add_argument("-w","--width",default=250, help="set the width of the video")
+#     parser.add_argument("-c","--configuration", help="path to configuration file")
+#     parser.add_argument("-v", "--verbose", action="store_true",help="use this switch for verbose mode")
+#
+#     try:
+#
+#
+#
+#         args=parser.parse_args()
+#
+#         livestream=False
+#         video = args.videostream
+#         if args.livestream:
+#
+#             video = int(args.videostream)
+#
+#             livestream=True
+#
+#             if not video>=0:
+#                 video = 0
+#
+#
+#         width = int(args.width)
+#         if not width >= 250 and width<=640:
+#             width = 250
+#
+#         confpath = args.configuration
+#
+#         if args.verbose:
+#             debug=True
+#             print("Verbose mode Activated..")
+#         else:
+#             debug=False
+#
+#         inputs.video_filename = args.videostream
+#         inputs.activity_id = "100"
+#         activity_id, video_filename = PeopleCounterConfig()
+#         print(activity_id)
+#
+#     except Exception as e:
+#
+#         print("Fatal ERROR  ")
+#         print(e)
+#
 
-#call PeopleCounterConfig_CommandInput() function if you are passing the parameter as command line arguments
 def PeopleCounterConfig_CommandInput():
-
-    
     parser = argparse.ArgumentParser()
-    parser.add_argument("videostream",help="The video input stream")
+    parser.add_argument("videostream", help="The video input stream")
     parser.add_argument("-l", "--livestream", action="store_true",help="use this option if you are reading livestream from a camera")
-    parser.add_argument("-w","--width",default=250, help="set the width of the video")
-    parser.add_argument("-c","--configuration", help="path to configuration file")
-    parser.add_argument("-v", "--verbose", action="store_true",help="use this switch for verbose mode")
+    parser.add_argument("-w", "--width", default=250, help="set the width of the video")
+    parser.add_argument("-c", "--configuration", help="path to configuration file")
+    parser.add_argument("-v", "--verbose", action="store_true", help="use this switch for verbose mode")
 
     try:
 
+        args = parser.parse_args()
 
-
-        args=parser.parse_args()
-        
-        livestream=False
+        livestream = False
         video = args.videostream
         if args.livestream:
-            
+
             video = int(args.videostream)
-            
-            livestream=True
-            
-            if not video>=0:
+
+            livestream = True
+
+            if not video >= 0:
                 video = 0
-            
-            
+
         width = int(args.width)
-        if not width >= 250 and width<=640:
+        if not width >= 250 and width <= 640:
             width = 250
-            
+
         confpath = args.configuration
 
         if args.verbose:
-            debug=True
+            debug = True
             print("Verbose mode Activated..")
         else:
-            debug=False
+            debug = False
 
-        inputs.video_filename = args.videostream
-        inputs.activity_id = "100"
-        activity_id, video_filename = PeopleCounterConfig()
-        print(activity_id)
-            
+        # inputs.video_filename = args.videostream
+        # inputs.activity_id = "100"
+        # activity_id, video_filename = PeopleCounterConfig()
+        # print(activity_id)
+
+        PeopleCounterConfig(video_filename=video, confpath=confpath, livestream=livestream, width=width, debug=debug)
+
+    except Exception as e:
+
+        print("Fatal ERROR  ")
+        print(e)
+
+
+def PeopleCounterConfig_GUIInput():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", "--livestream", action="store_true",default=False,help="use this option if you are reading livestream from a camera")
+    parser.add_argument("-w", "--width", default=250, help="set the width of the video")
+    parser.add_argument("-v", "--verbose", action="store_true",default=True, help="use this switch for verbose mode")
+
+    try:
+
+        args = parser.parse_args()
+
+        livestream = False
+
+        if args.livestream:
+
+            video = int(input("enter the camera id : "))
+
+            livestream = True
+
+            if not video >= 0:
+                video = 0
+
+        else:
+            video = filedialog.askopenfilename()
+
+        width = int(args.width)
+        if not width >= 250 and width <= 640:
+            width = 250
+
+        confpath = filedialog.asksaveasfilename()
+
+        if args.verbose:
+            debug = True
+            print("Verbose mode Activated..")
+        else:
+            debug = False
+
+        # inputs.video_filename = args.videostream
+        # inputs.activity_id = "100"
+        # activity_id, video_filename = PeopleCounterConfig()
+        # print(activity_id)
+
+        PeopleCounterConfig(video_filename=video,confpath=confpath,livestream=livestream,width=width,debug=debug)
+
     except Exception as e:
 
         print("Fatal ERROR  ")
@@ -301,7 +401,8 @@ def PeopleCounterConfig_CommandInput():
 
 if __name__=="__main__":
 
-    PeopleCounterConfig_CommandInput()
+    #PeopleCounterConfig_CommandInput()
+    PeopleCounterConfig_GUIInput()
     
                     
                     

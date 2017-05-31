@@ -1,9 +1,9 @@
 ################################################################
 #                                                              #
 # count people #                                               #
-# created and developped by Bufo Innovation #                  #
-# Developer : Pritam Samadder Ria Santra #                     #
-# Company Website : http://www.bufo.co.in #                    #
+# created and developped by Infinity Corporation #             #
+# Developer : Pritam Samadder And Ria Santra #                 #
+#                                                              #
 #                                                              #
 #                                                              #
 ################################################################
@@ -25,6 +25,8 @@ import datetime
 import sys
 import csv
 from pymongo import MongoClient
+from tkinter import filedialog
+import argparse
 
 
 class inputs:
@@ -50,6 +52,8 @@ class PeopleCount:
             #input()
             self.db=cu.selectDB(self.conn,"bufo")
             print("db = : ",self.db)
+        else:
+            self.db=None
 
     def CountPeople(self,parameters):
 
@@ -793,9 +797,10 @@ class PeopleCount:
                             #updatethread=Thread(target=self.updateInMDB,args=(self.db,"dwell",dwelldatabase,result),name="update_thread")
                             if verbose:
                                 print("update thread starting ")
-                            res=self.updateInMDB(self.db,"count",eventlist)
+                            if self.ismongodb:
+                                res=self.updateInMDB(self.db,"count",eventlist)
                             
-                            eventlist=[]
+                            #eventlist=[]
                         
                         updatethreadtimer =0   
                        
@@ -851,7 +856,9 @@ class PeopleCount:
                     framenumber=cap.get(cv2.CAP_PROP_POS_FRAMES)
                 print("exiting ",framenumber)
                 cap.release()
+            print("Exitting from process of counting people")
             return eventlist ,framenumber
+
 
 
 
@@ -890,9 +897,9 @@ class PeopleCount:
             print("Line Number : ",err[-1].tb_lineno)
             return -1
 
-    def start(self,configpath):
+    def start(self):
 
-        params=self.InputFromConfigFile(configpath)
+        params=self.InputFromGUI()
         data,fn=self.CountPeople(params)
         return (data,fn)
 
@@ -1003,48 +1010,105 @@ class PeopleCount:
             print("file name : ",err[-1].tb_frame.f_code.co_filename)
             print("Line Number : ",err[-1].tb_lineno)
 
+    # [parameter] takes the form of [videostream,[{configuration}],bool livestream, int frameskip, int flushtime, int starttime, bool novideo, bool debug]
+    def InputFromGUI(self):
 
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-l", "--livestream", action="store_true", default=False,help="use this option if you are reading livestream from a camera")
+        parser.add_argument("-w", "--width", default=250, help="set the width of the video")
+        parser.add_argument("-s", "--frameskip", default=0, help="skip the number of frames in each iteration")
+        parser.add_argument("-f", "--flushtime", default=1000, help="flush time")
+        parser.add_argument("-v", "--verbose", action="store_true", default=True,help="use this switch for verbose mode")
+        parser.add_argument("-n", "--novideo", action="store_true", default=False,help="show video footage")
 
+        try:
+            args = parser.parse_args()
+            livestream = False
 
+            if args.livestream:
 
+                video = int(input("enter the camera id : "))
 
+                livestream = True
 
+                if not video >= 0:
+                    video = 0
 
+            else:
+                video = filedialog.askopenfilename()
 
+            if args.novideo:
+                novideo=True
+            else:
+                novideo=False
+            if args.verbose:
+                debug=True
+            else:
+                debug=False
+            width=args.width
+            if width<=0 or width>450 :
+                width=250
+            # read parameters from configuration file
+            configfile=filedialog.askopenfilename()
+            f = open(configfile, "r")
+            configuration = json.load(f)
+            f.close()
 
+            videostream = []
+            conf = configuration
 
+            parameters = []
+            parameters.extend((video, conf, True, 0, 0, 0, False, True))
+            return parameters
 
+        except Exception as e:
+            print("fatal ERROR in InputFromConfigFile() : ")
+            print("Error Name : ", e)
+            print("Error in details : ")
+            err = sys.exc_info()
+            print("Error Type : ", err[0])
+            print("file name : ", err[-1].tb_frame.f_code.co_filename)
+            print("Line Number : ", err[-1].tb_lineno)
+            return -1
 
-
-
-
-
-
-    
 # =================================================================================================
 
-##if __name__=="__main__":
-##
-##    pst=datetime.datetime.now()
-##    print()
-##    print("Program started at : ",pst.__str__())
-##    print()
-##    configfile = "config.json"
-##    params = InputFromConfigFile(configfile)
-##    print("PARAM : ", params)
-##    print(params)
-##    data,fn=CountPeople(params)
-##    print()
-##    print()
-##    pet=datetime.datetime.now()
-##
-##    totaltime=(pet-pst).total_seconds()
-##    print()
-##    print("Program started at : ",pst.__str__())
-##    print("Program ended at : ",pet.__str__())
-##    print("processed frame : ",fn)
-##    print()
-##    print("total processing time [in seconds]  : ",totaltime)
+if __name__=="__main__":
+
+   pst=datetime.datetime.now()
+   print()
+   print("Program started at : ",pst.__str__())
+   print()
+   #configfile = "config.json"
+   #params = InputFromConfigFile(configfile)
+   #print("PARAM : ", params)
+   #print(params)
+   #data,fn=CountPeople(params)
+
+   pc=PeopleCount()
+   data,fn=pc.start()
+   print()
+   print()
+   print(data)
+   if(data):
+       try:
+           outjson=filedialog.asksaveasfilename()
+           f=open(outjson,"w")
+           json.dump(data,f)
+           f.flush()
+           f.close()
+       except Exception as e:
+           print("error occured while trying to write data to file")
+
+   pet=datetime.datetime.now()
+
+   totaltime=(pet-pst).total_seconds()
+   print()
+   print("Program started at : ",pst.__str__())
+   print("Program ended at : ",pet.__str__())
+   print("processed frame : ",fn)
+   print()
+   print("total processing time [in seconds]  : ",totaltime)
 
     
 

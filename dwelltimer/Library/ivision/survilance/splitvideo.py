@@ -1,9 +1,9 @@
 ################################################################
 #                                                              #
-# Split video #                                                  #
-# created and developped by Bufo Innovation #                  #
+# Split video #                                                #
+# created and developped by Infinity Corporation #             #
 # Developer : Ria Santra #                                     #
-# Company Website : http://www.bufo.co.in #                    #
+#                                                              #
 #                                                              #
 #                                                              #
 ################################################################
