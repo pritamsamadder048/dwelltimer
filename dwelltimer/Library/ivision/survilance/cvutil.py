@@ -3,7 +3,7 @@
 # easy corp #                                                  #
 # created and developped by Pritam Samadder #                  #
 # Developer : Pritam Samadder AND Ria Santra #                 #
-# Developer Email : pritamsamadder048@gmail.com #              #
+#                                                              #
 #                                                              #
 #                                                              #
 ################################################################

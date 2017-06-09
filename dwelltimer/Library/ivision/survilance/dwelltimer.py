@@ -1,9 +1,9 @@
 ################################################################
 #                                                              #
 # count people #                                               #
-# created and developped by Infinities #                       #
-# Developer : Ria Santra      #                                #
-# Company Website : http://www.bufo.co.in #                    #
+# created and developped by Infinity Corporation #             #
+# Developer : Ria Santra and Pritam Samadder #                 #
+#                                                              #
 #                                                              #
 #                                                              #
 ################################################################
